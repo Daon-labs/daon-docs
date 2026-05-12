@@ -97,9 +97,9 @@ KRX 전용 API(`H0STCNT0`, `H0STASP0`, `H0STANC0`, `H0STPGM0`)와 NXT 전용 API
 | 사용 | API | 실전 TR ID | URL | 메모 | 가져올 수 있는 가치 있는 데이터 | 권장 갱신 주기 |
 | --- | --- | --- | --- | --- | --- | --- |
 | o | 주식당일분봉조회 | `FHKST03010200` | `/uapi/domestic-stock/v1/quotations/inquire-time-itemchartprice` | MVP 장중 분석의 핵심 1분봉 API. 실시간 체결 WebSocket 대체. 당일 데이터만 제공되며 1회 최대 30건이므로 장중에는 1분 단위로 누적 캐시한다. 최신 진행 중 분봉은 잠정값, 지난 분봉은 확정값으로 취급 | 당일 분봉 기준 일자/시간, 현재가, 시고저, 체결 거래량, 누적 거래대금 | 장중 변곡점 분석의 기본 데이터. 관심 종목은 1분마다 현재 분봉 갱신, 과거 분봉은 불변 캐시 |
-| o | 주식일별분봉조회 | `FHKST03010230` | `/uapi/domestic-stock/v1/quotations/inquire-time-dailychartprice` |  | 특정 일자의 분봉, 시고저, 체결량, 누적 거래대금 | 과거 장중 복기용. 조회 후 장 종료 데이터는 장기 캐시 |
-|  | 국내주식기간별시세(일/주/월/년) | `FHKST03010100` | `/uapi/domestic-stock/v1/quotations/inquire-daily-itemchartprice` |  | 일/주/월/년 OHLCV, 거래대금, 전일 대비 거래량, 회전율 | 장기 추세와 복수 종목 비교의 기본 데이터. 장중은 일봉 현재값 5~30분 보정, 확정 데이터는 장마감 후 1회 |
-|  | 주식현재가 일자별 | `FHKST01010400` | `/uapi/domestic-stock/v1/quotations/inquire-daily-price` |  | 최근 일자별 가격 흐름 | 기간별시세 보조. 질문 시 또는 일 1회 |
+| o | 주식일별분봉조회 | `FHKST03010230` | `/uapi/domestic-stock/v1/quotations/inquire-time-dailychartprice` | 과거 특정 거래일의 1분봉 복기용 API. 당일 장중은 `주식당일분봉조회`, 과거 날짜는 본 API로 분리한다. 1회 최대 120건이며 KIS 보관 범위는 최대 1년이므로 장기 회고가 필요한 종목은 조회 후 내부 장기 캐시를 고려한다. | 특정 일자의 분봉, 시고저, 체결량, 누적 거래대금 | 과거 장중 복기용. 조회 후 장 종료 데이터는 장기 캐시 |
+| o | 국내주식기간별시세(일/주/월/년) | `FHKST03010100` | `/uapi/domestic-stock/v1/quotations/inquire-daily-itemchartprice` | 중장기 가격 추세와 복수 종목 비교의 기본 API. 일/주/월/년 단위를 지원하고 시작일·종료일을 직접 지정할 수 있어 최근 30개 구간으로 제한되는 `주식현재가 일자별`보다 범용성이 높다. 장기 추세, 돌파 여부, 상대 성과 비교에 사용한다. | 일/주/월/년 OHLCV, 거래대금, 전일 대비 거래량, 회전율 | 장기 추세와 복수 종목 비교의 기본 데이터. 장중은 일봉 현재값 5~30분 보정, 확정 데이터는 장마감 후 1회 |
+| x | 주식현재가 일자별 | `FHKST01010400` | `/uapi/domestic-stock/v1/quotations/inquire-daily-price` | 가격 추세 분석은 `국내주식기간별시세(일/주/월/년)`로 대체 가능하므로 MVP에서는 제외. 외국인 소진율, 외국인 순매수 수량 등 일부 보조 필드는 있지만 수급 전문 API와 자체 계산으로 대체 가능하며, 최근 30개 구간 제한으로 범용성도 낮다. | 최근 일자별 가격 흐름 | 기간별시세 보조. 질문 시 또는 일 1회 |
 
 ### 4.5 P0: 시장/업종 맥락
 
