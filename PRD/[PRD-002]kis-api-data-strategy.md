@@ -103,14 +103,14 @@ KRX 전용 API(`H0STCNT0`, `H0STASP0`, `H0STANC0`, `H0STPGM0`)와 NXT 전용 API
 
 ### 4.5 P0: 시장/업종 맥락
 
-| 사용 | API | 실전 TR ID | URL | 가져올 수 있는 가치 있는 데이터 | 권장 갱신 주기 |
-| --- | --- | --- | --- | --- | --- |
-|  | 국내업종 현재지수 | `FHPUP02100000` | `/uapi/domestic-stock/v1/quotations/inquire-index-price` | 업종 지수 현재가, 등락률, 거래량/대금, 상승/하락/상하한 종목 수 | 종목 움직임이 시장/업종 동조인지 판단. 주요 업종 5~30초, 전체 업종 1~5분 |
-|  | 국내업종 시간별지수(분) | `FHPUP02110200` | `/uapi/domestic-stock/v1/quotations/inquire-index-timeprice` | 업종 분 단위 현재가, 등락률, 거래량/대금 | 특정 시점 종목 변동과 업종 동시 변동 비교. 1분 단위 |
-|  | 업종 분봉조회 | `FHKUP03500200` | `/uapi/domestic-stock/v1/quotations/inquire-time-indexchartprice` | 업종 분봉 OHLCV | 장중 복기와 상대강도 계산. 관심 업종 1분 단위 |
-|  | 국내업종 일자별지수 | `FHPUP02120000` | `/uapi/domestic-stock/v1/quotations/inquire-index-daily-price` | 업종 일자별 지수, 상승/하락 종목 수, 연중 고저 | 장기 추세 비교. 장마감 후 1회, 과거 데이터 장기 캐시 |
-|  | 국내휴장일조회 | `CTCA0903R` | `/uapi/domestic-stock/v1/quotations/chk-holiday` | 영업일/휴장일 | 장 스케줄, 배치 실행 판단. 월 1회 및 월말/연말 보강 |
-|  | 국내선물 영업일조회 | `HHMCM000002C0` | `/uapi/domestic-stock/v1/quotations/market-time` | 시장 운영 시간성 정보 | 장운영 캘린더 보조. 일 1회 |
+| 사용 | API | 실전 TR ID | URL | 메모 | 가져올 수 있는 가치 있는 데이터 | 권장 갱신 주기 |
+| --- | --- | --- | --- | --- | --- | --- |
+| o | 국내업종 현재지수 | `FHPUP02100000` | `/uapi/domestic-stock/v1/quotations/inquire-index-price` | 개별 종목 움직임을 시장·업종 동조 여부와 분리해 설명하기 위한 기본 맥락 API. 업종 지수 등락률뿐 아니라 상승/하락 종목 수, 시고저, 거래대금까지 함께 제공하므로 '업종 전체 강세인지 일부 종목 주도인지' 해석하는 데 사용한다. | 업종 지수 현재가, 등락률, 거래량/대금, 상승/하락/상하한 종목 수 | 종목 움직임이 시장/업종 동조인지 판단. 주요 업종 5~30초, 전체 업종 1~5분 |
+| x | 국내업종 시간별지수(분) | `FHPUP02110200` | `/uapi/domestic-stock/v1/quotations/inquire-index-timeprice` | 업종의 시간대별 흐름을 볼 수 있지만, 장중 복기와 종목 분봉 비교에는 OHLC 구조를 제공하는 `업종 분봉조회`가 더 적합하다. MVP에서는 중복 API로 보고 제외한다. | 업종 분 단위 현재가, 등락률, 거래량/대금 | 특정 시점 종목 변동과 업종 동시 변동 비교. 1분 단위 |
+| o | 업종 분봉조회 | `FHKUP03500200` | `/uapi/domestic-stock/v1/quotations/inquire-time-indexchartprice` | 종목 분봉과 같은 해상도로 업종 흐름을 비교하기 위한 핵심 API. 장중 특정 시점의 종목 변동이 업종 동조인지 단독 이슈인지 판단하는 데 사용한다. 1분 단위 복기, 상대강도 비교, 장중 변곡점 해석의 기본 업종 시계열로 채택한다. | 업종 분봉 OHLCV | 장중 복기와 상대강도 계산. 관심 업종 1분 단위 |
+| o | 국내업종 일자별지수 | `FHPUP02120000` | `/uapi/domestic-stock/v1/quotations/inquire-index-daily-price` | 종목의 중장기 추세를 업종 흐름과 비교하기 위한 일/주/월 단위 업종 시계열 API. 특정 종목의 최근 성과가 업종 추세와 같은 방향인지, 상대적으로 강한지 약한지 해석하는 데 사용한다. | 업종 일자별 지수, 상승/하락 종목 수, 연중 고저 | 장기 추세 비교. 장마감 후 1회, 과거 데이터 장기 캐시 |
+| o | 국내휴장일조회 | `CTCA0903R` | `/uapi/domestic-stock/v1/quotations/chk-holiday` | 장 운영 여부와 직전 거래일 계산의 기준이 되는 운영 필수 API. 휴장일에도 배치가 실행되거나, 전일 비교 기준을 잘못 잡는 문제를 막는다. 문서상 과도 호출을 피해야 하므로 1일 1회 수준으로 캐시한다. | 영업일/휴장일 | 장 스케줄, 배치 실행 판단. 월 1회 및 월말/연말 보강 |
+| x | 국내선물 영업일조회 | `HHMCM000002C0` | `/uapi/domestic-stock/v1/quotations/market-time` | 인접 영업일과 당일 장 시작·마감 시각을 제공하지만, 휴장일 판별은 `국내휴장일조회`, 실제 장 상태 확인은 `국내주식 장운영정보 (통합)`으로 대체 가능하다. 국내주식 MVP의 핵심 운영 API로는 채택하지 않는다. | 시장 운영 시간성 정보 | 장운영 캘린더 보조. 일 1회 |
 
 ### 4.6 P0: 이벤트와 이상 흐름
 
