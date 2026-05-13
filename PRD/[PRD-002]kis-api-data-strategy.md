@@ -126,17 +126,17 @@ KRX 전용 API(`H0STCNT0`, `H0STASP0`, `H0STANC0`, `H0STPGM0`)와 NXT 전용 API
 
 ### 5.1 수급과 투자자 동향
 
-| 사용 | API | 실전 TR ID | URL | 활용 가치 | 권장 갱신 주기 |
-| --- | --- | --- | --- | --- | --- |
-|  | 주식현재가 투자자 | `FHKST01010900` | `/uapi/domestic-stock/v1/quotations/inquire-investor` | 개인/외국인/기관 순매수 수량과 거래대금, 매수/매도 거래량 | 당일 수급 설명. 장중 5~15분 또는 질문 시 |
-|  | 시장별 투자자매매동향(시세) | `FHPTJ04030000` | `/uapi/domestic-stock/v1/quotations/inquire-investor-time-by-market` | 시장 단위 개인/외국인/기관 매수/매도/순매수 | 시장 방향성 설명. 장중 1~5분 |
-|  | 시장별 투자자매매동향(일별) | `FHPTJ04040000` | `/uapi/domestic-stock/v1/quotations/inquire-investor-daily-by-market` | 시장별 일간 투자자 매매동향 | 장기 맥락. 장마감 후 1회 |
-|  | 종목별 투자자매매동향(일별) | `FHPTJ04160001` | `/uapi/domestic-stock/v1/quotations/investor-trade-by-stock-daily` | 종목별 외국인/개인/기관 순매수, OHLCV, 거래대금 | 장기 수급 분석. 장마감 후 1회, 과거 캐시 |
-|  | 종목별 외인기관 추정가집계 | `HHPTJ04160200` | `/uapi/domestic-stock/v1/quotations/investor-trend-estimate` | 외국인/기관 가집계 순매수 수량 | 장중 수급 추정. 관심 종목 5~15분 |
-|  | 국내기관/외국인 매매종목가집계 | `FHPTJ04400000` | `/uapi/domestic-stock/v1/quotations/foreign-institution-total` | 외국인/기관 매매 종목 가집계 | 시장 주도 종목 탐지. 장중 5~15분 |
-|  | 외국계 매매종목 가집계 | `FHKST644100C0` | `/uapi/domestic-stock/v1/quotations/frgnmem-trade-estimate` | 외국계 매매 집중 종목 | 급변 원인 보조. 장중 5~15분 |
-|  | 종목별 외국계 순매수추이 | `FHKST644400C0` | `/uapi/domestic-stock/v1/quotations/frgnmem-pchs-trend` | 종목별 외국계 순매수 추이 | 특정 종목 외국계 수급 설명. 5~15분 또는 질문 시 |
-|  | 회원사 실시간 매매동향(틱) | `FHPST04320000` | `/uapi/domestic-stock/v1/quotations/frgnmem-trade-trend` | 회원사/외국계 매매동향 틱 | 고급 장중 원인 분석. P1 후반, 관심 종목만 실시간 또는 짧은 TTL |
+| 사용 | API | 실전 TR ID | URL | 메모 | 활용 가치 | 권장 갱신 주기 |
+| --- | --- | --- | --- | --- | --- | --- |
+| x | 주식현재가 투자자 | `FHKST01010900` | `/uapi/domestic-stock/v1/quotations/inquire-investor` | 종목별 투자자 수급을 확인할 수 있으나, 보다 상세한 기관 세부주체·외국인 등록/미등록 구분·OHLCV를 제공하는 `종목별 투자자매매동향(일별)`로 대체한다. API 수를 줄이고 종목 수급 분석을 단일 주력 API로 정리하기 위해 MVP에서는 제외한다. | 개인/외국인/기관 순매수 수량과 거래대금, 매수/매도 거래량 | 장마감 후 1회, 필요 시 질문 응답용 조회 |
+| o | 시장별 투자자매매동향(시세) | `FHPTJ04030000` | `/uapi/domestic-stock/v1/quotations/inquire-investor-time-by-market` | 코스피·코스닥 같은 시장 전체의 오늘 장중 수급 상태를 보는 API. `FHPTJ04040000`은 과거 일별 시장 수급, `FHKST01010900`은 개별 종목의 확정 수급이므로 역할이 다르다. 장중 현재 시장이 외국인·기관 매수세인지 매도세인지 설명하는 데 사용한다. | 시장 단위 개인/외국인/기관 매수/매도/순매수 | 시장 방향성 설명. 장중 1~5분 |
+| o | 시장별 투자자매매동향(일별) | `FHPTJ04040000` | `/uapi/domestic-stock/v1/quotations/inquire-investor-daily-by-market` | 시장 단위 투자자 수급의 과거 일자별 추세를 보는 API. `FHPTJ04030000`은 오늘 장중 시장 수급, `FHKST01010900`은 개별 종목 수급이므로 역할이 다르다. 최근 며칠간 외국인·기관 매매 방향이 누적되는지 설명하는 데 사용한다. | 시장별 일간 투자자 매매동향 | 장기 맥락. 장마감 후 1회 |
+| o | 종목별 투자자매매동향(일별) | `FHPTJ04160001` | `/uapi/domestic-stock/v1/quotations/investor-trade-by-stock-daily` | 종목별 일자 수급 분석의 주력 API로 채택. 개인·외국인·기관 수급뿐 아니라 기관 세부주체, 외국인 등록/미등록, OHLCV, 거래대금까지 제공해 요약형 API인 `주식현재가 투자자`를 대체한다. 장마감 후 종목 수급 해석과 과거 추세 분석에 활용한다. | 종목별 외국인/개인/기관 순매수, OHLCV, 거래대금 | 장기 수급 분석. 장마감 후 1회, 과거 캐시 |
+| o | 종목별 외인기관 추정가집계 | `HHPTJ04160200` | `/uapi/domestic-stock/v1/quotations/investor-trend-estimate` | 개별 종목의 장중 외국인·기관 수급을 추정해서 보는 API. `종목별 투자자매매동향(일별)`이 하루 최종 수급 결과를 보여준다면, 본 API는 장중 여러 시점의 중간 관측값을 제공한다. 직원 입력 기반 누계 자료라 실시간 원천 체결 데이터는 아니며, 장중 가격 급변 해석에서 수급 가설을 보조하는 신호로만 사용한다. | 외국인/기관 가집계 순매수 수량 | 장중 수급 추정. 관심 종목 5~15분 |
+| o | 국내기관/외국인 매매종목가집계 | `FHPTJ04400000` | `/uapi/domestic-stock/v1/quotations/foreign-institution-total` | 시장 전체에서 외국인·기관의 순매수·순매도 상위 종목을 찾는 랭킹형 수급 탐지 API. 특정 종목 하나의 장중 추정 수급은 `종목별 외인기관 추정가집계`, 시장 주도 종목 후보 발굴은 본 API로 역할을 나눈다. 직원 입력 기반 가집계이므로 탐지·후보 선별 용도로 사용한다. | 외국인/기관 매매 종목 가집계 | 시장 주도 종목 탐지. 장중 5~15분 |
+| x | 외국계 매매종목 가집계 | `FHKST644100C0` | `/uapi/domestic-stock/v1/quotations/frgnmem-trade-estimate` | 외국계 매매 집중 종목을 매수·매도 랭킹으로 보여주는 API지만, 시장 전체 수급 후보 탐지는 이미 `국내기관/외국인 매매종목가집계`로 커버한다. 외국계 흐름만 별도로 강조하는 기능이 필요해질 때 재검토하고, 현재 범위에서는 중복 탐지 API로 제외한다. | 외국계 매매 집중 종목 | 급변 원인 보조. 장중 5~15분 |
+| x | 종목별 외국계 순매수추이 | `FHKST644400C0` | `/uapi/domestic-stock/v1/quotations/frgnmem-pchs-trend` | 특정 종목의 외국계 순매수 흐름을 장중 시간축으로 보여주지만, 개별 종목의 장중 수급 가설은 `종목별 외인기관 추정가집계`, 확정 수급 해석은 `종목별 투자자매매동향(일별)`로 이미 커버한다. 외국계 흐름을 더 촘촘하게 추적하는 고급 분석이 필요해질 때 재검토한다. | 종목별 외국계 순매수 추이 | 특정 종목 외국계 수급 설명. 5~15분 또는 질문 시 |
+| x | 회원사 실시간 매매동향(틱) | `FHPST04320000` | `/uapi/domestic-stock/v1/quotations/frgnmem-trade-trend` | 회원사 단위의 틱성 매매 흐름까지 볼 수 있는 고급 장중 분석 API지만, 현재 범위에서는 과도하게 세밀하다. 장중 종목 수급 보조는 `종목별 외인기관 추정가집계`, 시장 주도 종목 탐지는 `국내기관/외국인 매매종목가집계`로 충분하므로 제외한다. 회원사별 체결 주체 분석이 필요한 고급 기능 단계에서 재검토한다. | 회원사/외국계 매매동향 틱 | 고급 장중 원인 분석. P1 후반, 관심 종목만 실시간 또는 짧은 TTL |
 
 ### 5.2 프로그램매매와 공매도/신용/대차
 
