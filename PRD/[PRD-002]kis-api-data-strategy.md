@@ -140,16 +140,16 @@ KRX 전용 API(`H0STCNT0`, `H0STASP0`, `H0STANC0`, `H0STPGM0`)와 NXT 전용 API
 
 ### 5.2 프로그램매매와 공매도/신용/대차
 
-| 사용 | API | 실전 TR ID | URL | 활용 가치 | 권장 갱신 주기 |
-| --- | --- | --- | --- | --- | --- |
-| o | 종목별 프로그램매매추이(체결) | `FHPPG04650101` | `/uapi/domestic-stock/v1/quotations/program-trade-by-stock` | 종목별 프로그램 매매 체결 추이 | 장중 수급 원인 설명. 1~5분 또는 질문 시 |
-| o | 종목별 프로그램매매추이(일별) | `FHPPG04650201` | `/uapi/domestic-stock/v1/quotations/program-trade-by-stock-daily` | 일별 프로그램 순매수 수량/대금 | 장기 수급 맥락. 장마감 후 1회 |
-|  | 프로그램매매 종합현황(시간) | `FHPPG04600101` | `/uapi/domestic-stock/v1/quotations/comp-program-trade-today` | 시장 전체 프로그램매매 시간 흐름 | 시장 급변 원인 후보. 장중 1~5분 |
-|  | 프로그램매매 종합현황(일별) | `FHPPG04600001` | `/uapi/domestic-stock/v1/quotations/comp-program-trade-daily` | 시장 프로그램매매 일별 흐름 | 중장기 시장 맥락. 장마감 후 1회 |
-|  | 프로그램매매 투자자매매동향(당일) | `HHPPG046600C1` | `/uapi/domestic-stock/v1/quotations/investor-program-trade-today` | 투자자별 차익/비차익 매도/매수/순매수 | 시장 수급 설명. 장중 5~15분 |
-|  | 국내주식 공매도 일별추이 | `FHPST04830000` | `/uapi/domestic-stock/v1/quotations/daily-short-sale` | 종목 공매도 일별 추이 | 하락 지속 원인 후보. 장마감 후 1회 |
-|  | 국내주식 신용잔고 일별추이 | `FHPST04760000` | `/uapi/domestic-stock/v1/quotations/daily-credit-balance` | 신용잔고 일별 변화 | 과열/수급 리스크 설명. 장마감 후 1회 |
-|  | 종목별 일별 대차거래추이 | `HHPST074500C0` | `/uapi/domestic-stock/v1/quotations/daily-loan-trans` | 대차거래 일별 추이 | 공매도/대차 부담 설명. 장마감 후 1회 |
+| 사용 | API | 실전 TR ID | URL | 메모 | 활용 가치 | 권장 갱신 주기 |
+| --- | --- | --- | --- | --- | --- | --- |
+| o | 종목별 프로그램매매추이(체결) | `FHPPG04650101` | `/uapi/domestic-stock/v1/quotations/program-trade-by-stock` | 개별 종목의 장중 프로그램 매수/매도 체결 흐름 확인. 종목 급등락 원인 후보로 사용 | 종목별 프로그램 매매 체결 추이 | 장중 수급 원인 설명. 1~5분 또는 질문 시 |
+| o | 종목별 프로그램매매추이(일별) | `FHPPG04650201` | `/uapi/domestic-stock/v1/quotations/program-trade-by-stock-daily` | 개별 종목의 일별 프로그램 순매수/순매도 추세 확인. 장기 수급 맥락과 장중 체결 추이의 기준선 | 일별 프로그램 순매수 수량/대금 | 장기 수급 맥락. 장마감 후 1회 |
+| o | 프로그램매매 종합현황(시간) | `FHPPG04600101` | `/uapi/domestic-stock/v1/quotations/comp-program-trade-today` | 시장 전체 프로그램매매 장중 흐름. 종목별 프로그램매매가 개별 종목 원인 분석이라면, 이 API는 코스피/코스닥 전체 프로그램 순매수/순매도 압력을 판단하는 시장 맥락 API. 최근 30분만 제공되므로 장중 스냅샷/단기 캐시 중심으로 사용 | 시장 전체 프로그램매매 시간 흐름 | 시장 급변 원인 후보. 장중 1~5분 |
+| o | 프로그램매매 종합현황(일별) | `FHPPG04600001` | `/uapi/domestic-stock/v1/quotations/comp-program-trade-daily` | 시장 전체 프로그램매매 일별 이력. 오늘 장중 프로그램 순매수/순매도가 과거 대비 이례적인지 판단하는 기준선 API. 8개월 이상 과거 조회는 불가하므로 장마감 후 일별 캐시로 보존 | 시장 프로그램매매 일별 흐름 | 중장기 시장 맥락. 장마감 후 1회 |
+| o | 프로그램매매 투자자매매동향(당일) | `HHPPG046600C1` | `/uapi/domestic-stock/v1/quotations/investor-program-trade-today` | 시장 전체 프로그램매매를 투자자 주체별로 분해하는 당일 보강 API. 프로그램매매 종합현황이 전체 방향을 보여준다면, 이 API는 금융투자/투신/연기금 등 어떤 주체가 차익·비차익 프로그램 순매수/순매도를 만드는지 설명하는 데 사용. 핵심 트리거보다는 장중 원인 설명 보강용으로 사용 | 투자자별 차익/비차익 매도/매수/순매수 | 시장 수급 설명. 장중 5~15분 |
+| o | 국내주식 공매도 일별추이 | `FHPST04830000` | `/uapi/domestic-stock/v1/quotations/daily-short-sale` | 개별 종목의 일별 공매도 체결 수량/거래대금/비중을 확인하는 API. 하락 지속, 반등 실패, 수급 부담 설명에 사용하되 공매도만으로 원인을 단정하지 않고 가격·거래량·투자자 수급·대차거래와 함께 해석. 장중 트리거보다는 장마감 후 일별 보조 지표로 사용 | 종목 공매도 일별 추이 | 하락 지속 원인 후보. 장마감 후 1회 |
+| o | 국내주식 신용잔고 일별추이 | `FHPST04760000` | `/uapi/domestic-stock/v1/quotations/daily-credit-balance` | 개별 종목의 일별 신용융자 신규/상환/잔고와 잔고 비율을 확인하는 API. 레버리지 매수 과열, 반대매매 부담, 하락 시 매물 압력 설명에 사용하되 신용잔고만으로 방향을 단정하지 않고 가격·거래량·공매도·대차·투자자 수급과 함께 해석. 장마감 후 일별 보조 지표로 사용 | 신용잔고 일별 변화 | 과열/수급 리스크 설명. 장마감 후 1회 |
+| o | 종목별 일별 대차거래추이 | `HHPST074500C0` | `/uapi/domestic-stock/v1/quotations/daily-loan-trans` | 개별 종목의 일별 대차 신규/상환/잔고 주수와 잔고 금액을 확인하는 API. 공매도 가능 물량과 잠재 매도 부담을 보는 보조 지표로 사용하되, 대차잔고 증가를 실제 공매도 체결로 단정하지 않는다. 공매도 일별추이·신용잔고·가격·거래량과 함께 장마감 후 해석 | 대차거래 일별 추이 | 공매도/대차 부담 설명. 장마감 후 1회 |
 
 ### 5.3 종목 기본정보와 재무/전망
 
