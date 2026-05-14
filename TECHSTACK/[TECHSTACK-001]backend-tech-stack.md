@@ -39,27 +39,6 @@ MVP에서 백엔드는 다음 성격을 우선한다.
 
 프로젝트 지침에 따라 KIS Open API 판단은 `데이터/한국투자증권_오픈API_전체문서_20260504_030007.xlsx`를 우선 참고한다.
 
-MVP 백엔드가 우선 감싸야 하는 실전 API 범위는 다음과 같다.
-
-| 용도 | KIS API 예시 | 방식 | 실전 TR_ID |
-| --- | --- | --- | --- |
-| 접근 토큰 | 접근토큰발급(P) | REST | - |
-| WebSocket 접속키 | 실시간 (웹소켓) 접속키 발급 | WEBSOCKET/REST 승인 | - |
-| 현재가 | 주식현재가 시세 | REST | FHKST01010100 |
-| 당일 체결 | 주식현재가 당일시간대별체결 | REST | FHPST01060000 |
-| 당일 분봉 | 주식당일분봉조회 | REST | FHKST03010200 |
-| 일/주/월/년 시세 | 국내주식기간별시세(일/주/월/년) | REST | FHKST03010100 |
-| 호가/예상체결 | 주식현재가 호가/예상체결 | REST | FHKST01010200 |
-| 체결 내역 | 주식현재가 체결 | REST | FHKST01010300 |
-| 투자자 | 주식현재가 투자자 | REST | FHKST01010900 |
-| 재무 | 국내주식 재무비율 | REST | FHKST66430300 |
-| 투자의견 | 국내주식 종목투자의견 | REST | FHKST663300C0 |
-| 추정실적 | 국내주식 종목추정실적 | REST | HHKST668300C0 |
-| 종목별 투자자 동향 | 종목별 투자자매매동향(일별) | REST | FHPTJ04160001 |
-| 실시간 체결 | 국내주식 실시간체결가 (통합/KRX) | WEBSOCKET | H0UNCNT0 / H0STCNT0 |
-| 실시간 호가 | 국내주식 실시간호가 (통합/KRX) | WEBSOCKET | H0UNASP0 / H0STASP0 |
-| 장운영 정보 | 국내주식 장운영정보 (통합) | WEBSOCKET | H0UNMKO0 |
-
 실전 도메인은 REST 기준 `https://openapi.koreainvestment.com:9443`, WebSocket 기준 `ws://ops.koreainvestment.com:21000`을 사용한다.
 
 ## 4. 주요 백엔드 모듈
