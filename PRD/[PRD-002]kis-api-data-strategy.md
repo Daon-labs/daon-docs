@@ -49,6 +49,23 @@ KIS 엑셀 문서는 API별 공식 데이터 갱신 주기를 일괄적으로 �
 - 모든 답변에는 데이터 기준 시각을 표시해야 한다.
 - API 호출 제한이 확인되면 후속 기술 문서에서 종목 우선순위, 큐잉, TTL을 조정한다.
 
+### 2.4 Agent tool 노출 원칙
+
+이 문서의 KIS API 목록은 Spring Boot 내부 adapter와 domain tool executor가 사용할 원천 데이터 후보를 정의한다. LLM에게 KIS raw API, TR ID, URL, KIS 응답 원문을 직접 tool로 노출하지 않는다.
+
+LLM-facing tool은 다음처럼 분석 의미 단위의 domain tool로 제공한다.
+
+- `GET_CURRENT_MARKET_SNAPSHOT`
+- `GET_INTRADAY_PRICE_FLOW`
+- `GET_HISTORICAL_PRICE_TREND`
+- `GET_MARKET_AND_INDUSTRY_CONTEXT`
+- `GET_EVENT_CANDIDATES`
+- `GET_SUPPLY_DEMAND_CONTEXT`
+- `GET_FUNDAMENTAL_CONTEXT`
+- `COMPARE_STOCKS`
+
+Agent Planner는 사용자 질문을 scope, 명확화 필요 여부, 분석 대상 후보로 구조화한다. 이후 Analyst LLM은 Spring AI tool calling을 통해 필요한 domain tool을 선택할 수 있지만, 실제 KIS raw API 선택, 파라미터 구성, 캐시/TTL, 연속조회, rate limit, 응답 정규화, evidence packet 생성은 Spring Boot가 user-controlled execution으로 통제한다.
+
 ## 3. 핵심 기능별 필요한 데이터
 
 | 기능 | 필요한 데이터 | 핵심 KIS API | 사용자에게 주는 가치 |
@@ -174,8 +191,8 @@ KRX 전용 API(`H0STCNT0`, `H0STASP0`, `H0STANC0`, `H0STPGM0`)와 NXT 전용 API
 
 | 사용 | API | 실전 TR ID | URL | 메모 | 활용 가치 | 권장 갱신 주기 |
 | --- | --- | --- | --- | --- | --- | --- |
-| o | 거래량순위 | `FHPST01710000` | `/uapi/domestic-stock/v1/quotations/volume-rank` | 장중 거래량·거래대금 급증 종목을 찾는 후보 생성 API. 개별 종목 원인 분석의 직접 근거라기보다 오늘 먼저 볼 종목을 고르는 스캐너로 사용. 최대 30건만 조회 가능하고 다음 조회가 불가하므로 넓은 universe 스캔이 필요하면 종목조건검색 API를 대안으로 검토. 거래량 급증은 원인이 아니라 이상 징후이므로 분봉·뉴스·VI·수급과 함께 해석 | 거래량/거래대금 급증 종목 탐지 | 장중 1~5분 |
-| o | 국내주식 등락률 순위 | `FHPST01700000` | `/uapi/domestic-stock/v1/ranking/fluctuation` | 장중 급등/급락 종목 후보 생성 API. 가격 변동이 큰 종목을 빠르게 찾는 스캐너로 사용. 최대 30건만 조회 가능하고 다음 조회가 불가하므로 넓은 universe 스캔은 종목조건검색 API를 대안으로 검토. 등락률 자체는 원인이 아니라 결과이므로 거래량·분봉·뉴스·VI·수급과 함께 해석 | 급등/급락 종목 탐지 | 장중 1~5분 |
+| o | 거래량순위 | `FHPST01710000` | `/uapi/domestic-stock/v1/quotations/volume-rank` | 장중 거래량·거래대금 급증 종목을 찾는 후보 생성 API. 개별 종목 원인 분석의 직접 근거라기보다 오늘 먼저 볼 종목을 고르는 스캐너로 사용. 최대 30건만 조회 가능하고 다음 조회가 불가하므로 제한된 후보군 스캐너로만 사용. 거래량 급증은 원인이 아니라 이상 징후이므로 분봉·뉴스·VI·수급과 함께 해석 | 거래량/거래대금 급증 종목 탐지 | 장중 1~5분 |
+| o | 국내주식 등락률 순위 | `FHPST01700000` | `/uapi/domestic-stock/v1/ranking/fluctuation` | 장중 급등/급락 종목 후보 생성 API. 가격 변동이 큰 종목을 빠르게 찾는 스캐너로 사용. 최대 30건만 조회 가능하고 다음 조회가 불가하므로 제한된 후보군 스캐너로만 사용. 등락률 자체는 원인이 아니라 결과이므로 거래량·분봉·뉴스·VI·수급과 함께 해석 | 급등/급락 종목 탐지 | 장중 1~5분 |
 | o | 국내주식 체결강도 상위 | `FHPST01680000` | `/uapi/domestic-stock/v1/ranking/volume-power` | 장중 매수 체결 우위가 강한 종목 후보를 찾는 스캐너. 체결강도는 매수/매도 체결량 비율 기반이라 단기 수급 압력 판단에 유용하지만, 거래량이 적으면 999.99 같은 과장값이 나올 수 있음. 최소 거래량 조건을 걸고, 등락률·거래량·분봉과 함께 해석. 최대 30건만 조회 가능하고 다음 조회 불가 | 매수/매도 체결 우위 종목 탐지 | 장중 1~5분 |
 | o | 국내주식 대량체결건수 상위 | `FHKST190900C0` | `/uapi/domestic-stock/v1/ranking/bulk-trans-num` | 장중 큰 체결이 반복적으로 발생한 종목 후보를 찾는 스캐너. 거래량순위가 전체 거래량, 체결강도가 매수/매도 체결 비율이라면 이 API는 대량 체결의 반복성을 본다. 매수상위/매도상위로 나눠 조회 가능하며, 기관성 주문·프로그램매매·이벤트성 수급 후보를 찾는 데 보조적으로 사용. 최대 30건만 조회 가능하고 다음 조회 불가. 단독 원인 판단 금지 | 대량 체결 집중 종목 탐지 | 장중 1~5분 |
 | x | 국내주식 호가잔량 순위 | `FHPST01720000` | `/uapi/domestic-stock/v1/ranking/quote-balance` | 호가창의 매수/매도 잔량 쏠림을 보는 순위 API. 실제 체결이 아니라 대기 주문 기반이라 허수·취소 주문과 순간 변화에 취약함. MVP에서는 초단위 호가잔량 변화 추적이 필요 없고, 현재가 호가/예상체결 및 체결 기반 스캐너로 충분하므로 제외. 장중 매물벽/호가벽 분석을 강화할 때 P1 후보 | 매수/매도 잔량 쏠림 탐지 | 장중 1~5분 |
@@ -192,7 +209,7 @@ KRX 전용 API(`H0STCNT0`, `H0STASP0`, `H0STANC0`, `H0STPGM0`)와 NXT 전용 API
 | x | 국내주식 시간외잔량 순위 | `FHPST01760000` | `/uapi/domestic-stock/v1/ranking/after-hour-balance` | 시간외 매수/매도 잔량 기반 지표는 취소·허수 주문 영향이 크고, MVP에서 초단위 호가/잔량 변화 추적을 하지 않기로 했으므로 제외. 시간외 탐지는 거래량순위와 등락률순위로 충분 | 시간외 잔량 쏠림 탐지 | 시간외 단일가 구간 5~15분 |
 | x | 국내주식 예상체결 상승/하락상위 | `FHPST01820000` | `/uapi/domestic-stock/v1/ranking/exp-trans-updown` | 예상체결가는 동시호가 중 임시로 계산되는 체결 예상값이며 사용자가 관심 데이터가 아니라고 결정했으므로 제외. 시초/종가 동시호가 전략을 별도 기능으로 만들 때만 재검토 | 시초/종가 예상체결 급변 후보 | 동시호가 구간 10~30초 또는 1분 |
 | x | 국내주식 시간외예상체결등락률 | `FHKST11860000` | `/uapi/domestic-stock/v1/ranking/overtime-exp-trans-fluct` | 시간외 예상체결 기반 등락률은 실제 체결 확정 데이터가 아니고, 예상체결 계열을 제외하기로 한 결정과 일관되게 제외. 시간외 실제 거래량/등락률 API로 대체 | 시간외 예상체결 등락 탐지 | 시간외 구간 10~60초 |
-| o | 종목조건검색 목록조회/조회 | `HHKST03900300`, `HHKST03900400` | `/uapi/domestic-stock/v1/quotations/psearch-title`, `/uapi/domestic-stock/v1/quotations/psearch-result` | MVP에 종목 추천이 포함되므로 운영자가 HTS/eFriend Plus에 서버 저장한 조건검색식을 후보 universe 확장에 사용. 목록조회로 조건 `seq`를 확인한 뒤 결과 조회를 호출하며, 조건당 최대 100건 제한과 조건 미일치 시 오류 응답 가능성을 고려. API 결과를 그대로 추천하지 않고 내부 필터·점수화·재무/수급/거래대금 검증을 거친 후보로만 사용 | 운영자가 조건검색 universe를 정의하는 확장 기능 | 관리자 기능 도입 후 조건별 5~30분 |
+| x | 종목조건검색 목록조회/조회 | `HHKST03900300`, `HHKST03900400` | `/uapi/domestic-stock/v1/quotations/psearch-title`, `/uapi/domestic-stock/v1/quotations/psearch-result` | HTS/eFriend Plus에 저장된 사용자 조건검색식과 HTS 사용자 ID/조건 seq에 의존해 서버 측 자동 운영과 재현성이 낮다. MVP 후보군 생성은 거래량·등락률·체결강도·대량체결·시가총액·재무비율·시장가치 순위 API 조합으로 제한하고, 조건검색 API는 사용하지 않는다. | 사용하지 않음 | 제외 |
 
 ## 7. P2: 일정성 이벤트와 ETF/ETN 확장
 
@@ -257,7 +274,6 @@ KRX 전용 API(`H0STCNT0`, `H0STASP0`, `H0STANC0`, `H0STPGM0`)와 NXT 전용 API
 - 순위 API: 거래량, 등락률, 체결강도, 대량체결, 호가잔량, 조회상위, 신고/신저, 공매도/신용잔고 상위
 - 시간외/예상체결 순위: 장전/장마감/시간외 변동 후보 탐지
 - 예탁원 일정: 배당, 증자, 합병/분할, 주주총회, 상장 일정
-- 관리자 조건검색: 조건검색 목록/결과 조회
 
 이 단계는 사용자가 묻기 전에 이상 흐름 후보를 준비하고, 카카오톡 Agent의 응답 속도와 선제 알림성 기능을 강화한다.
 
@@ -306,6 +322,6 @@ KRX 전용 API(`H0STCNT0`, `H0STASP0`, `H0STANC0`, `H0STPGM0`)와 NXT 전용 API
 - Redis/DB 캐시 TTL과 스키마
 - tick, 1초봉, 1분봉, 일봉 저장 정책
 - 장중 인기 종목 우선순위 큐
-- LLM tool 입출력 스키마
+- Spring AI domain tool 입출력 스키마
 - 데이터 누락/지연/불일치 감지와 fallback
 - 카카오톡 Agent 응답 길이와 데이터 출처 표시 방식
