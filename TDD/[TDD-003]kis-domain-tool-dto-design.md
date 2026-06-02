@@ -766,6 +766,10 @@ public record WatchlistSnapshotDto(
         List<WatchlistAlertCandidateDto> alertCandidates,
         List<String> limitations
 ) {
+    public enum WatchlistSignal {
+        VOLUME_RANK,
+        FLUCTUATION_RANK
+    }
 }
 ```
 
@@ -800,7 +804,7 @@ public record CompareStocksContextDto(
 
 이 표는 LLM-facing domain tool 구현 상태를 추적한다. KIS raw API client, raw request/response DTO, endpoint metadata가 구현되어 있어도 domain DTO 정규화, Spring AI `@Tool` 노출, 단위 테스트가 없으면 `미구현`으로 본다.
 
-현재 구현 완료된 LLM-facing domain tool은 14개다. `GET_STOCK_NOW_CONTEXT`, `GET_INTRADAY_MOVE_CONTEXT`, `GET_EVENT_TIMELINE_CONTEXT`, `GET_MARKET_INDUSTRY_CONTEXT`, `GET_PRICE_TREND_CONTEXT`, `GET_SUPPLY_DEMAND_CONTEXT`, `GET_FUNDAMENTAL_CONTEXT`, `COMPARE_STOCKS_CONTEXT`, `GET_MARKET_MOVER_CANDIDATES`, `GET_PROGRAM_TRADING_CONTEXT`, `GET_SHORT_CREDIT_LOAN_CONTEXT`, `GET_EXPECTATION_CONTEXT`, `GET_AFTER_HOURS_CONTEXT`, `GET_SCREENED_STOCK_CANDIDATES`는 domain service, domain DTO, `KISTools`의 Spring AI `@Tool` 메서드, 단위 테스트를 기준으로 구현 완료로 본다.
+현재 구현 완료된 LLM-facing domain tool은 15개다. `GET_STOCK_NOW_CONTEXT`, `GET_INTRADAY_MOVE_CONTEXT`, `GET_EVENT_TIMELINE_CONTEXT`, `GET_MARKET_INDUSTRY_CONTEXT`, `GET_PRICE_TREND_CONTEXT`, `GET_SUPPLY_DEMAND_CONTEXT`, `GET_FUNDAMENTAL_CONTEXT`, `COMPARE_STOCKS_CONTEXT`, `GET_MARKET_MOVER_CANDIDATES`, `GET_PROGRAM_TRADING_CONTEXT`, `GET_SHORT_CREDIT_LOAN_CONTEXT`, `GET_EXPECTATION_CONTEXT`, `GET_AFTER_HOURS_CONTEXT`, `GET_SCREENED_STOCK_CANDIDATES`, `GET_WATCHLIST_SNAPSHOT`는 domain service, domain DTO, `KISTools`의 Spring AI `@Tool` 메서드, 단위 테스트를 기준으로 구현 완료로 본다.
 
 | 순서 | Domain Tool | 상태 | 코드 기준 | 다음 작업 |
 | --- | --- | --- | --- | --- |
@@ -818,7 +822,7 @@ public record CompareStocksContextDto(
 | 12 | `GET_EXPECTATION_CONTEXT` | 구현완료 | `KisExpectationContextService`, `ExpectationContextDto`, `KISTools.getExpectationContext`, `KisExpectationContextServiceTest` | 추정실적 대상 종목 예외 처리와 증권사별 투자의견 API 결합은 후속 보강 |
 | 13 | `GET_AFTER_HOURS_CONTEXT` | 구현완료 | `KisAfterHoursContextService`, `AfterHoursContextDto`, `KISTools.getAfterHoursContext`, `KisAfterHoursContextServiceTest` | 우선주/관리·주의 종목 필터와 장후 뉴스-후보 매칭 정확도는 후속 보강 |
 | 14 | `GET_SCREENED_STOCK_CANDIDATES` | 구현완료 | `KisScreenedStockCandidatesService`, `ScreenedStockCandidatesDto`, `KISTools.getScreenedStockCandidates`, `KisScreenedStockCandidatesServiceTest` | 관리/주의 종목 제외, 거래대금 조건, 재무 데이터 품질 필터는 후속 보강 |
-| 15 | `GET_WATCHLIST_SNAPSHOT` | 미구현 | catalog tool 없음 | 관심종목 멀티시세와 순위 API 기반 watchlist snapshot DTO 구현 |
+| 15 | `GET_WATCHLIST_SNAPSHOT` | 구현완료 | `KisWatchlistSnapshotService`, `WatchlistSnapshotDto`, `KISTools.getWatchlistSnapshot`, `KisWatchlistSnapshotServiceTest` | DB 관심그룹 연동, 30개 초과 종목 chunking, 상세 domain tool 후속 fan-out은 후속 보강 |
 
 상태 값은 다음 기준으로 갱신한다.
 
