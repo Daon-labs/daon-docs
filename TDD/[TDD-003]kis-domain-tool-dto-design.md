@@ -796,14 +796,14 @@ public record CompareStocksContextDto(
 
 이 표는 LLM-facing domain tool 구현 상태를 추적한다. KIS raw API client, raw request/response DTO, endpoint metadata가 구현되어 있어도 domain DTO 정규화, Spring AI `@Tool` 노출, 단위 테스트가 없으면 `미구현`으로 본다.
 
-현재 구현 완료된 LLM-facing domain tool은 3개다. `GET_STOCK_NOW_CONTEXT`, `GET_INTRADAY_MOVE_CONTEXT`, `GET_EVENT_TIMELINE_CONTEXT`는 domain service, domain DTO, `KISTools`의 Spring AI `@Tool` 메서드, 단위 테스트를 기준으로 구현 완료로 본다.
+현재 구현 완료된 LLM-facing domain tool은 4개다. `GET_STOCK_NOW_CONTEXT`, `GET_INTRADAY_MOVE_CONTEXT`, `GET_EVENT_TIMELINE_CONTEXT`, `GET_MARKET_INDUSTRY_CONTEXT`는 domain service, domain DTO, `KISTools`의 Spring AI `@Tool` 메서드, 단위 테스트를 기준으로 구현 완료로 본다.
 
 | 순서 | Domain Tool | 상태 | 코드 기준 | 다음 작업 |
 | --- | --- | --- | --- | --- |
 | 1 | `GET_STOCK_NOW_CONTEXT` | 구현완료 | `KisStockNowContextService`, `StockNowContextDto`, `KISTools.getStockNowContext`, `KisStockNowContextServiceTest` | 국내주식 장운영정보 WebSocket 스냅샷 결합은 후속 보강 |
 | 2 | `GET_INTRADAY_MOVE_CONTEXT` | 구현완료 | `KisIntradayMoveContextService`, `IntradayMoveContextDto`, `KISTools.getIntradayMoveContext`, `KisIntradayMoveContextServiceTest` | 과거 거래일 조회의 시간대별체결 보강과 다회 연속조회는 후속 보강 |
 | 3 | `GET_EVENT_TIMELINE_CONTEXT` | 구현완료 | `KisEventTimelineContextService`, `EventTimelineContextDto`, `KISTools.getEventTimelineContext`, `KisEventTimelineContextServiceTest` | 뉴스/공시 원문 조회와 상하한가 포착 시각 보강은 후속 보강 |
-| 4 | `GET_MARKET_INDUSTRY_CONTEXT` | 미구현 | catalog tool 없음 | 업종 현재지수, 업종 분봉, 업종 일자별지수 기반 시장/업종 맥락 DTO 구현 |
+| 4 | `GET_MARKET_INDUSTRY_CONTEXT` | 구현완료 | `KisMarketIndustryContextService`, `MarketIndustryContextDto`, `KISTools.getMarketIndustryContext`, `KisMarketIndustryContextServiceTest` | 종목코드 기반 업종 resolver와 종목 대비 상대강도 계산은 후속 보강 |
 | 5 | `GET_PRICE_TREND_CONTEXT` | 미구현 | catalog tool 없음 | 기간별시세와 현재가를 조합한 중장기 가격 추세 DTO 구현 |
 | 6 | `GET_SUPPLY_DEMAND_CONTEXT` | 미구현 | catalog tool 없음 | 투자자 일별, 외인기관 추정, 시장 수급을 조합한 수급 DTO 구현 |
 | 7 | `GET_FUNDAMENTAL_CONTEXT` | 미구현 | catalog tool 없음 | 주식기본조회, 재무비율, 손익계산서, 대차대조표, 안정성비율 기반 재무 DTO 구현 |
