@@ -607,6 +607,7 @@ public record ShortCreditLoanContextDto(
         List<LoanTransactionDailyDto> loanTransactionTrend,
         List<RankedStockDto> shortSaleRankCandidates,
         List<RankedStockDto> creditBalanceRankCandidates,
+        RiskSummaryDto riskSummary,
         List<String> cautions
 ) {
 }
@@ -796,7 +797,7 @@ public record CompareStocksContextDto(
 
 이 표는 LLM-facing domain tool 구현 상태를 추적한다. KIS raw API client, raw request/response DTO, endpoint metadata가 구현되어 있어도 domain DTO 정규화, Spring AI `@Tool` 노출, 단위 테스트가 없으면 `미구현`으로 본다.
 
-현재 구현 완료된 LLM-facing domain tool은 10개다. `GET_STOCK_NOW_CONTEXT`, `GET_INTRADAY_MOVE_CONTEXT`, `GET_EVENT_TIMELINE_CONTEXT`, `GET_MARKET_INDUSTRY_CONTEXT`, `GET_PRICE_TREND_CONTEXT`, `GET_SUPPLY_DEMAND_CONTEXT`, `GET_FUNDAMENTAL_CONTEXT`, `COMPARE_STOCKS_CONTEXT`, `GET_MARKET_MOVER_CANDIDATES`, `GET_PROGRAM_TRADING_CONTEXT`는 domain service, domain DTO, `KISTools`의 Spring AI `@Tool` 메서드, 단위 테스트를 기준으로 구현 완료로 본다.
+현재 구현 완료된 LLM-facing domain tool은 11개다. `GET_STOCK_NOW_CONTEXT`, `GET_INTRADAY_MOVE_CONTEXT`, `GET_EVENT_TIMELINE_CONTEXT`, `GET_MARKET_INDUSTRY_CONTEXT`, `GET_PRICE_TREND_CONTEXT`, `GET_SUPPLY_DEMAND_CONTEXT`, `GET_FUNDAMENTAL_CONTEXT`, `COMPARE_STOCKS_CONTEXT`, `GET_MARKET_MOVER_CANDIDATES`, `GET_PROGRAM_TRADING_CONTEXT`, `GET_SHORT_CREDIT_LOAN_CONTEXT`는 domain service, domain DTO, `KISTools`의 Spring AI `@Tool` 메서드, 단위 테스트를 기준으로 구현 완료로 본다.
 
 | 순서 | Domain Tool | 상태 | 코드 기준 | 다음 작업 |
 | --- | --- | --- | --- | --- |
@@ -810,7 +811,7 @@ public record CompareStocksContextDto(
 | 8 | `COMPARE_STOCKS_CONTEXT` | 구현완료 | `KisCompareStocksContextService`, `CompareStocksContextDto`, `KISTools.getCompareStocksContext`, `KisCompareStocksContextServiceTest` | focus별 하위 tool 선택 정책과 expectation 컨텍스트 결합은 후속 보강 |
 | 9 | `GET_MARKET_MOVER_CANDIDATES` | 구현완료 | `KisMarketMoverCandidatesService`, `MarketMoverCandidatesDto`, `KISTools.getMarketMoverCandidates`, `KisMarketMoverCandidatesServiceTest` | 후보별 상세 domain tool 후속 fan-out과 우선주/관리·주의 종목 필터는 후속 보강 |
 | 10 | `GET_PROGRAM_TRADING_CONTEXT` | 구현완료 | `KisProgramTradingContextService`, `ProgramTradingContextDto`, `KISTools.getProgramTradingContext`, `KisProgramTradingContextServiceTest` | 시장구분 코드 세분화와 프로그램매매 금액 단위 검증은 후속 보강 |
-| 11 | `GET_SHORT_CREDIT_LOAN_CONTEXT` | 미구현 | catalog tool 없음 | 공매도, 신용잔고, 대차거래 추이와 순위 후보를 조합한 리스크 DTO 구현 |
+| 11 | `GET_SHORT_CREDIT_LOAN_CONTEXT` | 구현완료 | `KisShortCreditLoanContextService`, `ShortCreditLoanContextDto`, `KISTools.getShortCreditLoanContext`, `KisShortCreditLoanContextServiceTest` | 공매도·신용·대차 rank 필터링, 잔고 단위 검증, 대차 연속조회는 후속 보강 |
 | 12 | `GET_EXPECTATION_CONTEXT` | 미구현 | catalog tool 없음 | 종목투자의견과 추정실적 기반 기대치 DTO 구현 |
 | 13 | `GET_AFTER_HOURS_CONTEXT` | 미구현 | catalog tool 없음 | 시간외 거래량/등락률 순위와 장후 뉴스 후보 DTO 구현 |
 | 14 | `GET_SCREENED_STOCK_CANDIDATES` | 미구현 | catalog tool 없음 | 재무비율 순위, 시장가치 순위, 시총 상위 기반 후보 DTO 구현 |
